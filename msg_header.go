@@ -40,11 +40,3 @@ func (h *Cmpp_header) read(r *bufio.Reader) (err error) {
 	h.Sequence_Id = uint32(unpackUint(p[8:12]))
 	return
 }
-
-func (h *Cmpp_header) setHeader(hh *Cmpp_header) {
-	h = hh
-}
-
-func (h *Cmpp_header) GetStruct() interface{} {
-	return *h
-}

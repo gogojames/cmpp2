@@ -29,9 +29,31 @@ func packUint(n uint64, l uint8) (p []byte) {
 type MSG interface {
 	read(r *bufio.Reader) (err error)
 	write(w *bufio.Writer) (err error)
+	SetSeqNum(uint32)
 	setHeader(h *Cmpp_header)
 	GetHeader() *Cmpp_header
 	GetStruct() interface{}
+}
+
+type MSG_struct struct {
+	Header *Cmpp_header
+	Body   interface{}
+}
+
+func (m *MSG_struct) setHeader(h *Cmpp_header) {
+	m.Header = h
+}
+
+func (m *MSG_struct) SetSeqNum(i uint32) {
+	m.Header.Sequence_Id = i
+}
+
+func (m *MSG_struct) GetHeader() *Cmpp_header {
+	return m.Header
+}
+
+func (m *MSG_struct) GetStruct() interface{} {
+	return *m
 }
 
 //CMPP_CONNECT消息定义

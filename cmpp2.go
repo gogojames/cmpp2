@@ -7,6 +7,7 @@ import (
 	"net"
 	//"os"
 	"strconv"
+	"sync"
 )
 
 type cmpp2 struct {
@@ -15,7 +16,7 @@ type cmpp2 struct {
 	writer    *bufio.Writer
 	connected bool
 	bound     bool
-	async     bool
+	mu        sync.Mutex
 	sequence  uint32
 }
 
@@ -38,17 +39,28 @@ func (cmpp2 *cmpp2) close() (err error) {
 	return
 }
 
-func (cmpp2 *cmpp2) Async(async bool) {
-	cmpp2.async = async
+func (s *cmpp2) NewSeqNum() uint32 {
+	defer s.mu.Unlock()
+	s.mu.Lock()
+	s.sequence++
+	return s.sequence
 }
 
-func (cmpp2 *cmpp2) bind() (err error) {
-	cmpp2.sequence++
+func (cmpp2 *cmpp2) bind(ms MSG_struct) (err error) {
+
 	h := new(Cmpp_header)
 	h.Command_id = CMPP_CONNECT
+	h.Sequence_Id = cmpp2.NewSeqNum()
+	ms.setHeader(h)
+	cmpp2.GetResp(ms)
 	return
 }
 
-func (cmpp2 *cmpp2) GetResp() {
+func (cmpp2 *cmpp2) GetResp(ms MSG_struct) (err error) {
+	h := new(Cmpp_header)
+	err = h.read(cmpp2.reader)
+	if err != nil {
+		return
+	}
 
 }
