@@ -6,7 +6,7 @@ package cmpp2
 
 import (
 	"bufio"
-	"errors"
+	//"errors"
 )
 
 type Cmpp_header struct {
@@ -17,9 +17,9 @@ type Cmpp_header struct {
 
 func (h *Cmpp_header) write(w *bufio.Writer) (err error) {
 	p := make([]byte, 12)
-	copy(p[0:4], packUint(uint64(h.Total_Length), 4))
-	copy(p[4:8], packUint(uint64(h.Command_id), 4))
-	copy(p[8:12], packUint(uint64(h.Sequence_Id), 4))
+	copy(p[0:4], packUi32(uint32(h.Total_Length)))
+	copy(p[4:8], packUi32(uint32(h.Command_id)))
+	copy(p[8:12], packUi32(uint32(h.Sequence_Id)))
 	_, err = w.Write(p)
 	if err != nil {
 		return
@@ -35,8 +35,8 @@ func (h *Cmpp_header) read(r *bufio.Reader) (err error) {
 	if err != nil {
 		return
 	}
-	h.Total_Length = uint32(unpackUint(p[0:4]))
-	h.Command_id = uint32(unpackUint(p[4:8]))
-	h.Sequence_Id = uint32(unpackUint(p[8:12]))
+	h.Total_Length = unpackUi32(p[0:4])
+	h.Command_id = COMMAND_ID(unpackUi32(p[4:8]))
+	h.Sequence_Id = unpackUi32(p[8:12])
 	return
 }
